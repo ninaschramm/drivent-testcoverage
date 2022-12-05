@@ -24,7 +24,6 @@ async function postBooking(userId: number, roomId: number) {
   };
 
   const booking = await bookingRepository.postBooking(data);
-  console.log(booking);
   return booking;
 }
 

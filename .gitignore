@@ -4,3 +4,8 @@ node_modules
 !.env.example
 yarn.lock
 .vscode
+/coverage.data
+/coverage/
+.coverage
+cover/
+.coverage*

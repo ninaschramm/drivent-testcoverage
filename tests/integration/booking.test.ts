@@ -139,6 +139,20 @@ describe("POST /booking", () => {
       expect(response.status).toEqual(httpStatus.FORBIDDEN);
     });
 
+    it("should respond with status 403 if users ticket isn't paid", async () => {      
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const hotel = await createHotel();
+      const room = await createRoomWithHotelId(hotel.id);
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({ roomId: room.id });
+
+      expect(response.status).toEqual(httpStatus.FORBIDDEN);
+    });
+
     it("should respond with status 403 when room is full", async () => {      
       const user = await createUser();
       const token = await generateValidToken(user);         
@@ -167,8 +181,6 @@ describe("POST /booking", () => {
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({ roomId: room.id });
   
       expect(response.status).toEqual(httpStatus.OK);
-  
-      console.log(response.body);
   
       expect(response.body).toMatchObject(
         {
@@ -228,6 +240,17 @@ describe("PUT /booking", () => {
       expect(response.status).toEqual(httpStatus.NOT_FOUND);
     });
 
+    it("should respond with status 404 if bookingId does not exist", async () => {      
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const createdHotel = await createHotel();
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);    
+  
+      const response = await server.put("/booking/0").set("Authorization", `Bearer ${token}`).send({ roomId: createdRoom.id });
+  
+      expect(response.status).toEqual(httpStatus.NOT_FOUND);
+    });
+
     it("should respond with status 403 if user does not have a valid ticket", async () => {      
       const user = await createUser();
       const token = await generateValidToken(user);
@@ -272,8 +295,6 @@ describe("PUT /booking", () => {
       const response = await server.put(`/booking/${booking.id}`).set("Authorization", `Bearer ${token}`).send({ roomId: newRoom.id });
   
       expect(response.status).toEqual(httpStatus.OK);
-  
-      console.log(response.body);
   
       expect(response.body).toMatchObject(
         {
