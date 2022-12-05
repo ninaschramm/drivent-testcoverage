@@ -16,6 +16,31 @@ async function findBooking(userId: number) {
 }
 
 async function postBooking(userId: number, roomId: number) {
+  await checkRules(userId, roomId);
+
+  const data: Prisma.BookingUncheckedCreateInput = {
+    userId,
+    roomId
+  };
+
+  const booking = await bookingRepository.postBooking(data);
+  console.log(booking);
+  return booking;
+}
+
+async function updateBooking(userId: number, roomId: number, bookingId: number) {
+  const checkBooking = await bookingRepository.findBookingById(bookingId);
+  if (!checkBooking) {
+    throw notFoundError();
+  }
+    
+  await checkRules(userId, roomId);
+
+  const booking = await bookingRepository.updateBooking(bookingId, roomId);
+  return booking;
+}
+
+async function checkRules(userId: number, roomId: number) {
   const room = await hotelRepository.findRoomById(roomId);
   if (!room) {
     throw notFoundError();
@@ -32,20 +57,12 @@ async function postBooking(userId: number, roomId: number) {
   if (!checkAvailability) {
     throw forbiddenError();
   }
-
-  const data: Prisma.BookingUncheckedCreateInput = {
-    userId,
-    roomId
-  };
-
-  const booking = await bookingRepository.postBooking(data);
-  console.log(booking);
-  return booking;
 }
 
 const bookingService = {
   findBooking,
-  postBooking
+  postBooking,
+  updateBooking
 };
 
 export default bookingService;
