@@ -147,7 +147,7 @@ describe("POST /booking", () => {
 
       for (let i=0; i<room.capacity; i++)
       {
-        await createBookingWithRoomId(room.id, hotel.id);
+        await createBookingWithRoomId(room.id, user.id);
       }     
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({ roomId: room.id });

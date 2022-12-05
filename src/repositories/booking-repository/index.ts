@@ -6,9 +6,10 @@ async function findBooking(userId: number) {
     where: {
       userId,
     },
-    include: {
+    select: {
+      id: true,
       Room: true
-    }
+    }    
   });
 }
 
@@ -18,9 +19,18 @@ async function postBooking(data: Prisma.BookingUncheckedCreateInput) {
   });
 }
 
+async function countBookings(roomId: number) {
+  return prisma.booking.count({
+    where: {
+      roomId,
+    }
+  });
+}
+
 const bookingRepository = {
   findBooking,
   postBooking,
+  countBookings
 };
 
 export default bookingRepository;
